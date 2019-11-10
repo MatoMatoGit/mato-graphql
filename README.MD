@@ -1,5 +1,4 @@
 # mato-graphql
-
 ## COMMANDS
 
 ### Install virtual environment
@@ -12,8 +11,20 @@
 `$ source venv/bin/activate`
 
 ### Install tools in virtual environment
-`$ pip install flask flask-graphql flask-migrate flask-sqlalchemy graphene graphene-sqlalchemy`
+`$ pip install -r requirements.txt`
 
 ### Run python server
-`$ source venv/bin/activate`
 `$ python app.py runserver`
+
+# Queries
+`{
+  createPost(username:"johndoe", title:"Hello 2", body:"Hello body 2"){
+    post{
+      title
+      body
+      author{
+        username
+      }
+    }
+  }
+}`
