@@ -3,7 +3,7 @@ from models import Measurement as MeasurementModel
 
 import graphene
 from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
+from graphene_sqlalchemy import SQLAlchemyObjectType
 
 
 class Sensor(SQLAlchemyObjectType):
@@ -19,25 +19,27 @@ class Measurement(SQLAlchemyObjectType):
 
 
 class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
-    all_measurements = SQLAlchemyConnectionField(Measurement, sort=Measurement.sort_argument())
-    all_sensors = SQLAlchemyConnectionField(Sensor, sort=None)
+    measurement = graphene.Field(Measurement)
 
 
 class CreateMeasurement(graphene.Mutation):
     class Arguments:
+        uuid = graphene.ID()
         data = graphene.Int(required=True)
-        sensor_hash = graphene.String(required=True)
+        hash = graphene.String(required=True)
 
-    measurement = graphene.Field(lambda: Measurement)
+    measurement = graphene.Field(lambda: Sensor)
+    sensor = graphene.Field(lambda: Measurement)
 
-    def mutate(self, info, data, sensor_hash):
-        measurement = Measurement(data=data, sensor_hash=sensor_hash)
-        return CreateMeasurement(measurement=measurement)
+    def mutate(self, info, data, hash):
+        measurement = Measurement(data=data)
+        sensor = Sensor(hash=hash)
+
+        return CreateMeasurement(measurement=measurement, sensor=sensor)
 
 
 class Mutation(graphene.ObjectType):
     create_measurement = CreateMeasurement.Field()
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation, types=[Sensor, Measurement])
+schema = graphene.Schema(query=Query, mutation=Mutation)

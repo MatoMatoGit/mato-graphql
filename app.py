@@ -25,7 +25,7 @@ example_query = """
         uuid
         data
         createdOn
-        sensorHash
+        hash
       }
     }
   }
