@@ -13,8 +13,8 @@ app.debug = True
 app.add_url_rule(
     "/graphql", view_func=GraphQLView.as_view("graphql",
                                               schema=schema,
-                                              graphiql=True)
-)
+                                              graphiql=True,
+                                              context={'session': db_session}))
 
 example_query = """
 {
@@ -25,7 +25,7 @@ example_query = """
         uuid
         data
         createdOn
-        sensorHash
+        hash
       }
     }
   }
@@ -41,12 +41,6 @@ example_query = """
   }
 }
 """
-
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
-
 
 if __name__ == "__main__":
     init_db()
