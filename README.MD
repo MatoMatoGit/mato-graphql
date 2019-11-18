@@ -5,7 +5,7 @@
 `$ pip install virtualenv`
 
 ### Alias virtual environment
-`$ virtualenv venv`
+`$ virtualenv -p python3 venv`
 
 ### Enter virtual environment
 `$ source venv/bin/activate`

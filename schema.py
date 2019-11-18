@@ -24,7 +24,6 @@ class Query(graphene.ObjectType):
 
 class CreateMeasurement(graphene.Mutation):
     class Arguments:
-        uuid = graphene.ID()
         data = graphene.Int(required=True)
         hash = graphene.String(required=True)
 

@@ -8,7 +8,7 @@ Base = declarative_base()
 class Sensor(Base):
     __tablename__ = 'sensor'
     id = Column(Integer, primary_key=True)
-    hash = Column(String)
+    hash = Column(String(16))
 
     def __repr__(self):
         return '<Sensor model {}>'.format(self.id)
