@@ -42,7 +42,24 @@ example_query = """
 }
 """
 
+example_mutation = """
+mutation {
+  createMeasurement(data:888, hash:"TESTHASH"){
+    measurement{
+      id
+      data
+      createdOn
+      uuid
+    }
+    sensor {
+      id
+      hash
+    }
+  }
+}
+"""
+
 if __name__ == "__main__":
-    init_db()
+    # init_db()
     test_db()
     app.run()

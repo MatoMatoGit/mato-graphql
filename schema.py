@@ -18,6 +18,12 @@ class Measurement(SQLAlchemyObjectType):
         interfaces = (relay.Node,)
 
 
+class Query(graphene.ObjectType):
+    node = graphene.relay.Node.Field()
+    all_measurements = SQLAlchemyConnectionField(Measurement, sort=Measurement.sort_argument())
+    all_sensors = SQLAlchemyConnectionField(Sensor, sort=None)
+
+
 class CreateMeasurement(graphene.Mutation):
     class Arguments:
         data = graphene.Int(required=True)
@@ -34,12 +40,6 @@ class CreateMeasurement(graphene.Mutation):
         db_session.commit()
 
         return CreateMeasurement(measurement=measurement, sensor=sensor)
-
-
-class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
-    all_measurements = SQLAlchemyConnectionField(Measurement, sort=Measurement.sort_argument())
-    all_sensors = SQLAlchemyConnectionField(Sensor, sort=None)
 
 
 class Mutation(graphene.ObjectType):
