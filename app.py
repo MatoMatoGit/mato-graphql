@@ -16,50 +16,13 @@ app.add_url_rule(
                                               graphiql=True,
                                               context={'session': db_session}))
 
-example_query = """
-{
-  allMeasurements {
-    edges {
-      node {
-        id
-        uuid
-        data
-        createdOn
-        hash
-      }
-    }
-  }
-  
-  allSensors {
-    edges {
-      node {
-        id
-        uuid
-        hash
-      }
-    }
-  }
-}
-"""
 
-example_mutation = """
-mutation {
-  createMeasurement(data:888, hash:"TESTHASH"){
-    measurement{
-      id
-      data
-      createdOn
-      uuid
-    }
-    sensor {
-      id
-      hash
-    }
-  }
-}
-"""
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     init_db()
     test_db()
-    app.run()
+    app.run(threaded=True, debug=True)
