@@ -1,9 +1,6 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import backref, relationship
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
-
+from database import Base
 
 class Sensor(Base):
     __tablename__ = 'sensor'
