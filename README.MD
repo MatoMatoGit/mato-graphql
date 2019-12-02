@@ -17,8 +17,8 @@
 `$ python app.py runserver`
 
 ### All at once
-`pip install virtualenv
-virtualenv -p python3 venv
-source venv/bin/activate
-pip install -r requirements.txt
+`pip install virtualenv &&
+virtualenv -p python3 venv &&
+source venv/bin/activate &&
+pip install -r requirements.txt &&
 python app.py runserver`
