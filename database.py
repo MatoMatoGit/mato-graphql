@@ -16,16 +16,11 @@ Base = declarative_base()
 Base.query = db_session.query_property()
 
 
-def init_db():
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-
-
 def test_db():
     connection = engine.connect()
 
-    result = connection.execute("select hash from sensor")
+    result = connection.execute("select sensor_hash from sensor")
     for row in result:
-        print("hash:", row['hash'])
+        print("sensor_hash:", row['sensor_hash'])
 
     connection.close()

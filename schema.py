@@ -1,5 +1,5 @@
-from models import Sensor as SensorModel, Measurement as MeasurementModel
-from database import db_session
+from models import Sensor as SensorModel, define_table_name
+from database import db_session, Base, engine
 
 import graphene
 from graphene import relay
@@ -12,38 +12,37 @@ class Sensor(SQLAlchemyObjectType):
         interfaces = (relay.Node,)
 
 
-class Measurement(SQLAlchemyObjectType):
-    class Meta:
-        model = MeasurementModel
-        interfaces = (relay.Node,)
-
-
 class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
-    all_measurements = SQLAlchemyConnectionField(Measurement, sort=Measurement.sort_argument())
-    all_sensors = SQLAlchemyConnectionField(Sensor, sort=None)
+    all_sensors = SQLAlchemyConnectionField(Sensor)
 
 
 class CreateMeasurement(graphene.Mutation):
     class Arguments:
         data = graphene.Int(required=True)
-        hash = graphene.String(required=True)
+        sensor_hash = graphene.String(required=True)
 
-    measurement = graphene.Field(lambda: Measurement)
     sensor = graphene.Field(lambda: Sensor)
 
-    def mutate(self, info, data, hash):
-        measurement = MeasurementModel(data=data)
-        sensor = SensorModel(hash=hash)
+    def mutate(self, info, data, sensor_hash):
+        measurement_model = define_table_name(sensor_hash)
+        measurement = measurement_model(data=data, sensor_hash=sensor_hash)
+        sensor = SensorModel(sensor_hash=sensor_hash)
+
+        Base.metadata.create_all(engine)
+
         db_session.add(measurement)
-        db_session.add(sensor)
+
+        if not sensor.query.filter_by(sensor_hash=sensor_hash).first():
+            db_session.add(sensor)
+
         db_session.commit()
 
-        return CreateMeasurement(measurement=measurement, sensor=sensor)
+        return CreateMeasurement(sensor=sensor)
 
 
 class Mutation(graphene.ObjectType):
     create_measurement = CreateMeasurement.Field()
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation, types=[Measurement, Sensor])
+schema = graphene.Schema(query=Query, mutation=Mutation)

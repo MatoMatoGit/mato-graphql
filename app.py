@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from database import db_session, init_db, test_db
+from database import db_session
 from flask import Flask
 from schema import schema
 from flask_cors import CORS
@@ -23,6 +23,4 @@ def shutdown_session(exception=None):
 
 
 if __name__ == '__main__':
-    init_db()
-    test_db()
     app.run(threaded=True, debug=True)
