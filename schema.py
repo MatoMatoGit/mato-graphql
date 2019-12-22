@@ -12,9 +12,22 @@ class Sensor(SQLAlchemyObjectType):
         interfaces = (relay.Node,)
 
 
+class Measurement(SQLAlchemyObjectType):
+    class Meta:
+        model = define_table_name("a4cf127d8b2c")
+        interfaces = (relay.Node,)
+
+
+class MeasurementConnection(relay.Connection):
+    class Meta:
+        node = Measurement
+
+
 class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
     all_sensors = SQLAlchemyConnectionField(Sensor)
+    all_measurements = SQLAlchemyConnectionField(MeasurementConnection)
+    sensor = graphene.relay.Node.Field(Sensor)
 
 
 class CreateMeasurement(graphene.Mutation):
