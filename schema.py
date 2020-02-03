@@ -1,4 +1,4 @@
-from models import Sensor as SensorModel, define_table_name
+from models import Sensor as SensorModel, Measurement as MeasurementModel
 from database import db_session, Base, engine
 
 import graphene
@@ -14,33 +14,45 @@ class Sensor(SQLAlchemyObjectType):
 
 class Measurement(SQLAlchemyObjectType):
     class Meta:
-        model = define_table_name("a4cf127d8b2c")
+        model = MeasurementModel
         interfaces = (relay.Node,)
-
-
-class MeasurementConnection(relay.Connection):
-    class Meta:
-        node = Measurement
 
 
 class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
-    all_sensors = SQLAlchemyConnectionField(Sensor)
-    all_measurements = SQLAlchemyConnectionField(MeasurementConnection)
-    sensor = graphene.relay.Node.Field(Sensor)
+    sensors = SQLAlchemyConnectionField(Sensor)
+    measurements = SQLAlchemyConnectionField(Measurement)
 
 
 class CreateMeasurement(graphene.Mutation):
     class Arguments:
-        data = graphene.Int(required=True)
         sensor_hash = graphene.String(required=True)
+        created_on_module = graphene.String(required=True)
+        sensor_type = graphene.String(required=True)
+        data = graphene.Float(required=True)
 
     sensor = graphene.Field(lambda: Sensor)
+    measurement = graphene.Field(lambda: Measurement)
 
-    def mutate(self, info, data, sensor_hash):
-        measurement_model = define_table_name(sensor_hash)
-        measurement = measurement_model(data=data, sensor_hash=sensor_hash)
-        sensor = SensorModel(sensor_hash=sensor_hash)
+    def mutate(
+            self,
+            info,
+            data,
+            sensor_hash,
+            created_on_module,
+            sensor_type
+    ):
+        sensor = SensorModel(
+            sensor_hash=sensor_hash,
+            created_on_module=created_on_module
+        )
+
+        measurement = MeasurementModel(
+            sensor_hash=sensor_hash,
+            sensor_type=sensor_type,
+            data=data,
+            created_on_module=created_on_module
+        )
 
         Base.metadata.create_all(engine)
 
@@ -51,11 +63,11 @@ class CreateMeasurement(graphene.Mutation):
 
         db_session.commit()
 
-        return CreateMeasurement(sensor=sensor)
+        return CreateMeasurement(sensor=sensor, measurement=measurement)
 
 
 class Mutation(graphene.ObjectType):
     create_measurement = CreateMeasurement.Field()
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation)
+schema = graphene.Schema(query=Query, types=[Sensor, Measurement], mutation=Mutation)

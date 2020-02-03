@@ -16,6 +16,26 @@ Base = declarative_base()
 Base.query = db_session.query_property()
 
 
+def init_db():
+    from models import Sensor, Measurement
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    test_hash = "TEST00001"
+    test_date = "2018-12-25 09:27:53"
+    test_sensor = Sensor(
+        sensor_hash=test_hash,
+        created_on_module=test_date)
+    db_session.add(test_sensor)
+    test_measurement = Measurement(
+        sensor_hash=test_sensor,
+        sensor_type="temp",
+        data=99,
+        created_on_module=test_date)
+    db_session.add(test_measurement)
+    db_session.commit()
+
+
 def test_db():
     connection = engine.connect()
 
