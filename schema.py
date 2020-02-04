@@ -1,27 +1,44 @@
+# GraphQL
+import graphene
+from graphene import Connection, Node
+from graphene_sqlalchemy import SQLAlchemyObjectType
+
+# Project
 from models import Sensor as SensorModel, Measurement as MeasurementModel
 from database import db_session, Base, engine
-
-import graphene
-from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from filters import MyFilterableConnectionField
 
 
-class Sensor(SQLAlchemyObjectType):
+class SensorNode(SQLAlchemyObjectType):
     class Meta:
         model = SensorModel
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
+        connection_field_factory = MyFilterableConnectionField.factory
 
 
-class Measurement(SQLAlchemyObjectType):
+class SensorConnection(Connection):
+    class Meta:
+        node = SensorNode
+
+
+class MeasurementNode(SQLAlchemyObjectType):
     class Meta:
         model = MeasurementModel
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
+        connection_field_factory = MyFilterableConnectionField.factory
+
+
+class MeasurementConnection(Connection):
+    class Meta:
+        node = MeasurementNode
 
 
 class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
-    sensors = SQLAlchemyConnectionField(Sensor)
-    measurements = SQLAlchemyConnectionField(Measurement)
+    sensor = graphene.relay.Node.Field(SensorNode)
+    all_sensors = MyFilterableConnectionField(SensorConnection)
+
+    measurement = graphene.relay.Node.Field(MeasurementNode)
+    all_measurements = MyFilterableConnectionField(MeasurementConnection)
 
 
 class CreateMeasurement(graphene.Mutation):
@@ -31,9 +48,10 @@ class CreateMeasurement(graphene.Mutation):
         sensor_type = graphene.String(required=True)
         data = graphene.Float(required=True)
 
-    sensor = graphene.Field(lambda: Sensor)
-    measurement = graphene.Field(lambda: Measurement)
+    sensor = graphene.Field(lambda: SensorNode)
+    measurement = graphene.Field(lambda: MeasurementNode)
 
+    @staticmethod
     def mutate(
             self,
             info,
@@ -70,4 +88,4 @@ class Mutation(graphene.ObjectType):
     create_measurement = CreateMeasurement.Field()
 
 
-schema = graphene.Schema(query=Query, types=[Sensor, Measurement], mutation=Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation)

@@ -10,3 +10,4 @@ requests
 sqlalchemy
 pymysql
 sqlacodegen
+graphene_sqlalchemy_filter

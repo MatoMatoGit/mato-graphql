@@ -11,10 +11,11 @@ CORS(app)
 app.debug = True
 
 app.add_url_rule(
-    "/graphql", view_func=GraphQLView.as_view("graphql",
-                                              schema=schema,
-                                              graphiql=True,
-                                              context={'session': db_session}))
+    "/graphql",
+    view_func=GraphQLView.as_view("graphql",
+                                  schema=schema,
+                                  graphiql=True,
+                                  context={'session': db_session}))
 
 
 @app.teardown_appcontext
