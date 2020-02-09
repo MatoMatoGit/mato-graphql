@@ -6,7 +6,7 @@ class SensorFilter(FilterSet):
     class Meta:
         model = Sensor
         fields = {
-            'sensor_hash': ['eq', 'ne', 'in', 'ilike'],
+            'sensor_hash': ['eq']
         }
 
 
@@ -14,8 +14,8 @@ class MeasurementFilter(FilterSet):
     class Meta:
         model = Measurement
         fields = {
-            'sensor_hash': ['eq', 'ne', 'in', 'ilike'],
-            'sensor_type': ['eq', 'ne', 'in', 'ilike'],
+            'sensor_hash': ['eq'],
+            'sensor_type': ['eq']
         }
 
 

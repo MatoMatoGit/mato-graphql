@@ -17,15 +17,4 @@ Base.query = db_session.query_property()
 
 
 def init_db():
-    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-
-
-def test_db():
-    connection = engine.connect()
-
-    result = connection.execute("select sensor_hash from sensor")
-    for row in result:
-        print("sensor_hash:", row['sensor_hash'])
-
-    connection.close()
